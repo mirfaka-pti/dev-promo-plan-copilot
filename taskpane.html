@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workbook Info</title>
+
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script src="taskpane.js" defer></script>
+
+    <style>
+        body {
+            font-family: Segoe UI, Arial, sans-serif;
+            padding: 16px;
+            margin: 0;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .row {
+            margin-bottom: 16px;
+        }
+
+        .label {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            word-break: break-all;
+            color: #333;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Workbook Information</h2>
+
+    <div class="row">
+        <div class="label">User Name</div>
+        <div id="userName" class="value">Loading...</div>
+    </div>
+
+    <div class="row">
+        <div class="label">Workbook URL</div>
+        <div id="workbookUrl" class="value">Loading...</div>
+    </div>
+
+</body>
+
+</html>
