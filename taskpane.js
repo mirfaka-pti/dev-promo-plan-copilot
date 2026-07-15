@@ -1,44 +1,5 @@
 Office.onReady(async () => {
 
-
-
-    try {
-
-        const result =
-            Office.context.requirements.isSetSupported(
-                "IdentityAPI",
-                "1.3"
-            );
-
-        const div = document.createElement("div");
-
-        div.style.marginTop = "20px";
-        div.style.padding = "10px";
-        div.style.border = "1px solid #ccc";
-
-        div.textContent =
-            "IdentityAPI supported = " + result;
-
-        document.body.appendChild(div);
-
-    } catch (error) {
-
-        const div = document.createElement("div");
-
-        div.style.marginTop = "20px";
-        div.style.padding = "10px";
-        div.style.border = "1px solid red";
-        div.style.color = "red";
-
-        div.textContent =
-            "ERROR: " +
-            (error.message || JSON.stringify(error));
-
-        document.body.appendChild(div);
-
-    };
-
-
     // Workbook URL
     const workbookUrl =
         Office?.context?.document?.url || "Workbook belum tersimpan di OneDrive / SharePoint";
