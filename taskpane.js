@@ -1,5 +1,16 @@
 Office.onReady(async () => {
 
+
+    // tambahkan di sini
+    const supported =
+        Office.context.requirements.isSetSupported(
+            "IdentityAPI",
+            "1.3"
+        );
+
+    alert("IdentityAPI supported = " + supported);
+
+
     // Workbook URL
     const workbookUrl =
         Office?.context?.document?.url || "Workbook belum tersimpan di OneDrive / SharePoint";
