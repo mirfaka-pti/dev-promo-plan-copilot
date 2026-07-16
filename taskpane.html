@@ -18,18 +18,34 @@
         .error {
             color: #b00020;
             border: 1px solid #b00020;
+            background: #fff5f5;
             padding: 12px;
             border-radius: 6px;
-            background: #fff5f5;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        select,
+        button {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
         }
 
         button {
-            padding: 10px 16px;
             cursor: pointer;
-            border: none;
-            border-radius: 4px;
             background: #0078d4;
             color: white;
+            border: none;
+            border-radius: 4px;
         }
 
         button:hover {
@@ -49,8 +65,8 @@
             padding: 12px 18px;
             border-radius: 6px;
             opacity: 0;
+            transition: all .3s ease;
             transform: translateY(20px);
-            transition: all 0.3s ease;
             pointer-events: none;
             z-index: 9999;
         }
@@ -67,18 +83,54 @@
     <div id="errorContainer"></div>
 
     <div id="app">
-        <h3>Promo Plan Automation</h3>
+
+        <h3>Promo Plan</h3>
+
+        <div class="form-group">
+            <label>Sheet Name</label>
+            <select id="sheetName"></select>
+        </div>
+
+        <div class="form-group">
+            <label>Brand</label>
+            <select id="brand">
+                <option value="BEYONDLY">BEYONDLY</option>
+                <option value="BIODEF">BIODEF</option>
+                <option value="BRIGHT NOW">BRIGHT NOW</option>
+                <option value="CRYSTALLURE">CRYSTALLURE</option>
+                <option value="EARTH">EARTH</option>
+                <option value="EMINA">EMINA</option>
+                <option value="INSTAPERFECT">INSTAPERFECT</option>
+                <option value="KAHF">KAHF</option>
+                <option value="KAHF PERFUME">KAHF PERFUME</option>
+                <option value="LABORE">LABORE</option>
+                <option value="LIGHT PLUS">LIGHT PLUS</option>
+                <option value="MAKE OVER">MAKE OVER</option>
+                <option value="OMG">OMG</option>
+                <option value="PUTRI">PUTRI</option>
+                <option value="TAVI">TAVI</option>
+                <option value="WARDAH">WARDAH</option>
+                <option value="WARDAH DE">WARDAH DE</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Promo Type</label>
+            <select id="promoType">
+                <option value="default">🌥️ BAU</option>
+                <option value="payday">💰 Payday Only</option>
+                <option value="peakday">🗓️ Peakday Only</option>
+                <option value="flashsale">⚡ Flash Sale Only</option>
+            </select>
+        </div>
 
         <button id="btnCreateLog">
-            Create Log
+            Start Promo Plan
         </button>
 
-        <div id="result" style="margin-top:12px;"></div>
     </div>
 
-    <div id="toast" class="toast">
-        Berhasil ditambahkan
-    </div>
+    <div id="toast" class="toast"></div>
 
 </body>
 
