@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: Segoe UI, Arial, sans-serif;
-            padding: 16px;
+            padding: 0 10px 10px;
         }
 
         .error {
@@ -25,6 +25,14 @@
 
         .form-group {
             margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .form-group-duo {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 4px;
+            column-gap: 15px;
         }
 
         label {
@@ -36,24 +44,48 @@
         select,
         button {
             width: 100%;
-            padding: 8px;
+            padding: 5px 10px;
             box-sizing: border-box;
+            line-height: 16px;
+            font-family: Segoe UI, sans-serif;
+            color: #424242;
+            border-radius: 4px;
+            border: 1px solid #d1d1d1;
         }
 
         button {
             cursor: pointer;
-            background: #0078d4;
+            background: #11783F;
             color: white;
             border: none;
             border-radius: 4px;
         }
 
         button:hover {
-            background: #106ebe;
+            background: #146938;
         }
 
         #app {
             display: none;
+            padding: 12px 16px;
+            background-color: #F8FDF8;
+            border: 1px solid #d1d1d1;
+            color: #424242;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        #info {
+            display: none;
+            padding: 12px 16px;
+            background-color: #fafafa;
+            border: 1px solid #d1d1d1;
+            color: #424242;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: "Segoe UI", sans-serif;
+            margin-bottom: 10px;
         }
 
         .toast {
@@ -75,6 +107,31 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        #info .info-header { 
+            display: flex; 
+            margin-bottom: 10px; 
+        }
+
+        #info .info-badge { 
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-color: #F2FBF2;
+            text-align: center;
+            line-height: 36px;
+            border: 1px solid rgba(17,120,63,.3);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #info .info-title { 
+            padding-left: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #242424;
+            line-height: 32px;
+        }
     </style>
 </head>
 
@@ -82,46 +139,61 @@
 
     <div id="errorContainer"></div>
 
+    <div id="info">
+        <div class="info-header">
+            <div class="info-badge">
+                <img src="https://raw.githubusercontent.com/mirfaka-pti/icon-assets/main/promo-plan/icon-reflect-16.png">
+            </div>
+            <div class="info-title">
+                Reflect per Brand
+            </div>
+        </div>
+        <div style="font-style: italic; line-height: 16px;">
+            Hanya memproses SKU dengan nama brand sesuai yang dipilih. Proses berjalan sekitar 5-10 menit, tergantung seberapa banyak SKU yang diproses dan bundle yang dimiliki.<br><br>
+            <span style="background-color: #999999">SKU dengan background abu-abu</span> menunjukkan telah memiliki discount rate dari hasil automation,<br>
+            sedangkan SKU dengan <span style="background-color: #b4a7d6">SKU dengan background ungu</span> menunjukkan bahwa terdapat salah satu BoM yang tidak tersedia pada tabel.
+        </div>
+    </div>
     <div id="app">
-
-        <h3>Promo Plan</h3>
-
         <div class="form-group">
             <label>Sheet Name</label>
             <select id="sheetName"></select>
         </div>
 
-        <div class="form-group">
-            <label>Brand</label>
-            <select id="brand">
-                <option value="BEYONDLY">BEYONDLY</option>
-                <option value="BIODEF">BIODEF</option>
-                <option value="BRIGHT NOW">BRIGHT NOW</option>
-                <option value="CRYSTALLURE">CRYSTALLURE</option>
-                <option value="EARTH">EARTH</option>
-                <option value="EMINA">EMINA</option>
-                <option value="INSTAPERFECT">INSTAPERFECT</option>
-                <option value="KAHF">KAHF</option>
-                <option value="KAHF PERFUME">KAHF PERFUME</option>
-                <option value="LABORE">LABORE</option>
-                <option value="LIGHT PLUS">LIGHT PLUS</option>
-                <option value="MAKE OVER">MAKE OVER</option>
-                <option value="OMG">OMG</option>
-                <option value="PUTRI">PUTRI</option>
-                <option value="TAVI">TAVI</option>
-                <option value="WARDAH">WARDAH</option>
-                <option value="WARDAH DE">WARDAH DE</option>
-            </select>
-        </div>
+        <div class="form-group-duo">
+            <div class="form-group">
+                <label>Brand</label>
+                <select id="brand">
+                    <option value="BEYONDLY">BEYONDLY</option>
+                    <option value="BIODEF">BIODEF</option>
+                    <option value="BRIGHT NOW">BRIGHT NOW</option>
+                    <option value="CRYSTALLURE">CRYSTALLURE</option>
+                    <option value="EARTH">EARTH</option>
+                    <option value="EMINA">EMINA</option>
+                    <option value="INSTAPERFECT">INSTAPERFECT</option>
+                    <option value="KAHF">KAHF</option>
+                    <option value="KAHF PERFUME">KAHF PERFUME</option>
+                    <option value="LABORE">LABORE</option>
+                    <option value="LIGHT PLUS">LIGHT PLUS</option>
+                    <option value="MAKE OVER">MAKE OVER</option>
+                    <option value="OMG">OMG</option>
+                    <option value="PUTRI">PUTRI</option>
+                    <option value="TAVI">TAVI</option>
+                    <option value="WARDAH">WARDAH</option>
+                    <option value="WARDAH DE">WARDAH DE</option>
+                    <option value="WPC">WPC</option>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label>Promo Type</label>
-            <select id="promoType">
-                <option value="default">🌥️ BAU</option>
-                <option value="payday">💰 Payday Only</option>
-                <option value="peakday">🗓️ Peakday Only</option>
-                <option value="flashsale">⚡ Flash Sale Only</option>
-            </select>
+            <div class="form-group">
+                <label>Event Name</label>
+                <select id="promoType">
+                    <option value="default">🌥️ BAU</option>
+                    <option value="payday">💰 Payday Only</option>
+                    <option value="peakday">🗓️ Peakday Only</option>
+                    <option value="flashsale">⚡ Flash Sale Only</option>
+                </select>
+            </div>
         </div>
 
         <button id="btnCreateLog">

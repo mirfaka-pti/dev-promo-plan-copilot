@@ -47,6 +47,8 @@ Office.onReady(async (info) => {
             return;
         }
 
+        document.getElementById("info")
+            .style.display = "block";
         document.getElementById("app")
             .style.display = "block";
 
