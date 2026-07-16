@@ -152,6 +152,9 @@ async function createLog() {
             sheetDropdown.options[
                 sheetDropdown.selectedIndex
             ];
+        
+        const now =
+            new Date();
 
         const payload = {
             sheetId:
@@ -163,7 +166,11 @@ async function createLog() {
             promoType:
                 document.getElementById(
                     "promoType"
-                ).value
+                ).value,
+            execId:
+                formatExecutionId(
+                    now
+                )
         };
 
         const response =
@@ -192,7 +199,7 @@ async function createLog() {
             );
         }
 
-        await insertAutomationLog();
+        await insertAutomationLog(now);
 
         showToast(
             "Berhasil ditambahkan"
@@ -214,7 +221,7 @@ async function createLog() {
    EXCEL LOG
 =========================== */
 
-async function insertAutomationLog() {
+async function insertAutomationLog(now) {
 
     await Excel.run(
         async (context) => {
@@ -239,9 +246,6 @@ async function insertAutomationLog() {
 
             const nextRow =
                 usedRange.rowCount;
-
-            const now =
-                new Date();
 
         const sheetDropdown =
             document.getElementById(
