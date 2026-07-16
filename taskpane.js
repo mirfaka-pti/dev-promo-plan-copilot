@@ -8,7 +8,7 @@ const GET_NAME_URL =
     "https://n8n.parainfra.id/webhook/f3ed50fa-9fda-4370-bea5-3cfaa8254c3e";
 
 const START_PROMO_URL =
-    "https://YOUR_DOMAIN/webhook/start-promo-plan";
+    "https://n8n.parainfra.id/webhook/72de3eb8-1e4e-4c3a-b486-2a165daec3ae";
 
 const BASIC_AUTH =
     "ZGVtb0BkZW1vLmNvbTpEZW1vMTIzNCE=";
@@ -154,25 +154,16 @@ async function createLog() {
             ];
 
         const payload = {
-
             sheetId:
                 selectedOption.value,
-
-            sheetName:
-                selectedOption.dataset.name,
-
             brand:
                 document.getElementById(
                     "brand"
                 ).value,
-
             promoType:
                 document.getElementById(
                     "promoType"
-                ).value,
-
-            workbookUrl:
-                Office.context.document.url
+                ).value
         };
 
         const response =
@@ -252,6 +243,32 @@ async function insertAutomationLog() {
             const now =
                 new Date();
 
+        const sheetDropdown =
+            document.getElementById(
+                "sheetName"
+            );
+
+        const selectedOption =
+            sheetDropdown.options[
+                sheetDropdown.selectedIndex
+            ];
+
+        const sheetId = selectedOption.value;
+
+        const sheetName = selectedOption.dataset.name;
+
+        const brand = document.getElementById(
+            "brand"
+        ).value;
+
+        const promoType = document.getElementById(
+            "promoType"
+        ).value;
+
+        const promoName = document.getElementById(
+            "promoType"
+        ).name;
+
             const values = [[
 
                 formatExecutionId(
@@ -262,9 +279,9 @@ async function insertAutomationLog() {
                     now
                 ),
 
-                "Hello World",
+                sheetName,
 
-                "Hello world 2",
+                "Reflect per Brand (" + brand + ")" + " [" + promoName + "]",
 
                 "Dummy User",
 
