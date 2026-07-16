@@ -1,4 +1,4 @@
-const PROMO_PLAN_KEYWORD = "promo plan";
+const PROMO_PLAN_KEYWORD = "promo";
 
 Office.onReady(async (info) => {
 
@@ -20,14 +20,8 @@ Office.onReady(async (info) => {
             document.getElementById("errorContainer").innerHTML = `
                 <div class="error">
                     <h3>Add-in tidak dapat digunakan</h3>
-
-                    <div>
-                        URL:
-                    </div>
-
-                    <div>
-                        ${escapeHtml(workbookUrl || "(URL tidak tersedia)")}
-                    </div>
+                    <div><b>Workbook URL:</b></div>
+                    <div>${escapeHtml(workbookUrl || "(URL tidak tersedia)")}</div>
                 </div>
             `;
 
@@ -79,7 +73,7 @@ async function createLog() {
             const executionStartTime =
                 formatDisplayDate(now);
 
-            const rowData = [[
+            const values = [[
                 executionId,
                 executionStartTime,
                 "Hello World",
@@ -88,28 +82,47 @@ async function createLog() {
                 "On going"
             ]];
 
-            worksheet
-                .getRangeByIndexes(
+            const range =
+                worksheet.getRangeByIndexes(
                     nextRow,
                     0,
                     1,
-                    rowData[0].length
-                )
-                .values = rowData;
+                    values[0].length
+                );
+
+            range.values = values;
 
             await context.sync();
 
         });
 
-        document.getElementById("result").innerHTML =
-            "<span class='success'>Log berhasil dibuat</span>";
+        document.getElementById("result").textContent =
+            "Log berhasil dibuat";
+
+        showToast("Berhasil ditambahkan");
 
     }
     catch (error) {
 
         document.getElementById("result").innerHTML =
-            `<span style="color:red;">${error.message}</span>`;
+            `<span style="color:red">${error.message}</span>`;
     }
+}
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 3000);
 }
 
 function formatExecutionId(date) {
