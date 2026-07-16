@@ -1,86 +1,169 @@
-Office.onReady(async () => {
-  try {
-    const manifest = Office.context.diagnostics.manifest;
+const PROMO_PLAN_KEYWORD = "promo plan";
 
-    // Buat elemen container untuk info WebApplicationInfo
-    const infoContainer = document.createElement("div");
-    infoContainer.style.fontFamily = "Segoe UI, sans-serif";
-    infoContainer.style.fontSize = "13px";
-    infoContainer.style.marginTop = "12px";
-    infoContainer.style.padding = "10px";
-    infoContainer.style.borderTop = "1px solid #ddd";
+Office.onReady(async (info) => {
 
-    if (manifest && manifest.webApplicationInfo) {
-      const webAppInfo = manifest.webApplicationInfo;
-
-      infoContainer.innerHTML = `
-        <h3 style="margin-bottom:6px;">WebApplicationInfo</h3>
-        <p><strong>Client ID:</strong> ${webAppInfo.id}</p>
-        <p><strong>Resource:</strong> ${webAppInfo.resource}</p>
-        <p><strong>Redirect URI:</strong> ${webAppInfo.redirectUri}</p>
-      `;
-    } else {
-      infoContainer.innerHTML = `
-        <h3 style="margin-bottom:6px;">WebApplicationInfo</h3>
-        <p style="color:red;">Tidak ditemukan di manifest.</p>
-      `;
-    }
-
-    // Tambahkan ke body taskpane
-    document.body.appendChild(infoContainer);
-  } catch (error) {
-    const errorContainer = document.createElement("div");
-    errorContainer.style.color = "red";
-    errorContainer.style.marginTop = "12px";
-    errorContainer.textContent = `Gagal membaca WebApplicationInfo: ${error.message}`;
-    document.body.appendChild(errorContainer);
-  };
-    // Workbook URL
-    const workbookUrl =
-        Office?.context?.document?.url || "Workbook belum tersimpan di OneDrive / SharePoint";
-
-    document.getElementById("workbookUrl").textContent =
-        workbookUrl;
-
-    // User Name
     try {
 
-        const token =
-            await OfficeRuntime.auth.getAccessToken({
-                allowSignInPrompt: true,
-                allowConsentPrompt: true
-            });
+        const isExcel =
+            info.host === Office.HostType.Excel;
 
-        const response = await fetch(
-            "https://graph.microsoft.com/v1.0/me",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
+        const workbookUrl =
+            Office?.context?.document?.url || "";
 
-        if (!response.ok) {
-            throw new Error(
-                `Graph API Error (${response.status})`
-            );
+        const isPromoPlan =
+            workbookUrl
+                .toLowerCase()
+                .includes(PROMO_PLAN_KEYWORD);
+
+        if (!isExcel || !isPromoPlan) {
+
+            document.getElementById("errorContainer").innerHTML = `
+                <div class="error">
+                    <h3>Add-in tidak dapat digunakan</h3>
+
+                    <div>
+                        URL:
+                    </div>
+
+                    <div>
+                        ${escapeHtml(workbookUrl || "(URL tidak tersedia)")}
+                    </div>
+                </div>
+            `;
+
+            return;
         }
 
-        const user = await response.json();
+        document.getElementById("app").style.display = "block";
 
-        document.getElementById("userName").textContent =
-            user.displayName ||
-            user.userPrincipalName ||
-            "User tidak ditemukan";
+        document
+            .getElementById("btnCreateLog")
+            .addEventListener("click", createLog);
 
-    } catch (error) {
+    }
+    catch (error) {
 
-        console.error(error);
-
-        document.getElementById("userName").textContent =
-            "SSO belum dikonfigurasi";
-
-        document.getElementById("userName").classList.add("error");
+        document.getElementById("errorContainer").innerHTML = `
+            <div class="error">
+                ${error.message}
+            </div>
+        `;
     }
 
 });
+
+async function createLog() {
+
+    try {
+
+        await Excel.run(async (context) => {
+
+            const worksheet =
+                context.workbook.worksheets.getItem("Automation Log");
+
+            const usedRange =
+                worksheet.getUsedRange();
+
+            usedRange.load("rowCount");
+
+            await context.sync();
+
+            const nextRow =
+                usedRange.rowCount;
+
+            const now = new Date();
+
+            const executionId =
+                formatExecutionId(now);
+
+            const executionStartTime =
+                formatDisplayDate(now);
+
+            const rowData = [[
+                executionId,
+                executionStartTime,
+                "Hello World",
+                "Hello world 2",
+                "Dummy User",
+                "On going"
+            ]];
+
+            worksheet
+                .getRangeByIndexes(
+                    nextRow,
+                    0,
+                    1,
+                    rowData[0].length
+                )
+                .values = rowData;
+
+            await context.sync();
+
+        });
+
+        document.getElementById("result").innerHTML =
+            "<span class='success'>Log berhasil dibuat</span>";
+
+    }
+    catch (error) {
+
+        document.getElementById("result").innerHTML =
+            `<span style="color:red;">${error.message}</span>`;
+    }
+}
+
+function formatExecutionId(date) {
+
+    const yy =
+        String(date.getFullYear()).slice(-2);
+
+    const mm =
+        String(date.getMonth() + 1).padStart(2, "0");
+
+    const dd =
+        String(date.getDate()).padStart(2, "0");
+
+    const hh =
+        String(date.getHours()).padStart(2, "0");
+
+    const mi =
+        String(date.getMinutes()).padStart(2, "0");
+
+    const ss =
+        String(date.getSeconds()).padStart(2, "0");
+
+    return `${yy}${mm}${dd}-${hh}${mi}${ss}`;
+}
+
+function formatDisplayDate(date) {
+
+    const dd =
+        String(date.getDate()).padStart(2, "0");
+
+    const mm =
+        String(date.getMonth() + 1).padStart(2, "0");
+
+    const yyyy =
+        date.getFullYear();
+
+    const hh =
+        String(date.getHours()).padStart(2, "0");
+
+    const mi =
+        String(date.getMinutes()).padStart(2, "0");
+
+    const ss =
+        String(date.getSeconds()).padStart(2, "0");
+
+    return `${dd}/${mm}/${yyyy} ${hh}:${mi}:${ss}`;
+}
+
+function escapeHtml(text) {
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
