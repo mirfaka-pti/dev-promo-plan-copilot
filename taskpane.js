@@ -5,7 +5,7 @@ const PROMO_PLAN_KEYWORD = "promo";
 =========================== */
 
 const GET_NAME_URL =
-    "https://YOUR_DOMAIN/webhook/get-name";
+    "https://n8n.parainfra.id/webhook/f3ed50fa-9fda-4370-bea5-3cfaa8254c3e";
 
 const START_PROMO_URL =
     "https://YOUR_DOMAIN/webhook/start-promo-plan";
