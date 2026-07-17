@@ -245,7 +245,8 @@ async function insertAutomationLog(now) {
       sheetName,
       `Reflect per Brand (${brand}) [${promoName}]`,
       "Dummy User",
-      "On going"
+      "On going",
+      ""
     ]];
 
     // Tambahkan baris ke tabel
