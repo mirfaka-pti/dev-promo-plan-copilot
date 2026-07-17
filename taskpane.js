@@ -222,93 +222,39 @@ async function createLog() {
 =========================== */
 
 async function insertAutomationLog(now) {
+  await Excel.run(async (context) => {
+    const worksheet = context.workbook.worksheets.getItem("Automation Log");
 
-    await Excel.run(
-        async (context) => {
+    // Ambil tabel berdasarkan nama (pastikan nama tabel di Excel benar)
+    const table = worksheet.tables.getItem("AutomationLog");
 
-            const worksheet =
-                context
-                    .workbook
-                    .worksheets
-                    .getItem(
-                        "Automation Log"
-                    );
+    // Ambil data dari elemen taskpane
+    const sheetDropdown = document.getElementById("sheetName");
+    const selectedOption = sheetDropdown.options[sheetDropdown.selectedIndex];
+    const sheetId = selectedOption.value;
+    const sheetName = selectedOption.dataset.name;
 
-            const usedRange =
-                worksheet
-                    .getUsedRange();
+    const brand = document.getElementById("brand").value;
+    const promoType = document.getElementById("promoType").value;
+    const promoName = document.getElementById("promoType").name;
 
-            usedRange.load(
-                "rowCount"
-            );
+    // Siapkan data untuk baris baru
+    const values = [[
+      formatExecutionId(now),
+      formatDisplayDate(now),
+      sheetName,
+      `Reflect per Brand (${brand}) [${promoName}]`,
+      "Dummy User",
+      "On going"
+    ]];
 
-            await context.sync();
+    // Tambahkan baris ke tabel
+    table.rows.add(null, values);
 
-            const nextRow =
-                usedRange.rowCount;
-
-        const sheetDropdown =
-            document.getElementById(
-                "sheetName"
-            );
-
-        const selectedOption =
-            sheetDropdown.options[
-                sheetDropdown.selectedIndex
-            ];
-
-        const sheetId = selectedOption.value;
-
-        const sheetName = selectedOption.dataset.name;
-
-        const brand = document.getElementById(
-            "brand"
-        ).value;
-
-        const promoType = document.getElementById(
-            "promoType"
-        ).value;
-
-        const promoName = document.getElementById(
-            "promoType"
-        ).name;
-
-            const values = [[
-
-                formatExecutionId(
-                    now
-                ),
-
-                formatDisplayDate(
-                    now
-                ),
-
-                sheetName,
-
-                "Reflect per Brand (" + brand + ")" + " [" + promoName + "]",
-
-                "Dummy User",
-
-                "On going"
-
-            ]];
-
-            worksheet
-                .getRangeByIndexes(
-                    nextRow,
-                    0,
-                    1,
-                    values[0].length
-                )
-                .values =
-                values;
-
-            await context.sync();
-
-        }
-    );
-
+    await context.sync();
+  });
 }
+
 
 /* ===========================
    TOAST
