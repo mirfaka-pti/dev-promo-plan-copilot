@@ -151,7 +151,7 @@
         <div style="font-style: italic; line-height: 16px;">
             Hanya memproses SKU dengan nama brand sesuai yang dipilih. Proses berjalan sekitar 5-10 menit, tergantung seberapa banyak SKU yang diproses dan bundle yang dimiliki.<br><br>
             <span style="background-color: #999999">SKU dengan background abu-abu</span> menunjukkan telah memiliki discount rate dari hasil automation,<br>
-            sedangkan SKU dengan <span style="background-color: #b4a7d6">SKU dengan background ungu</span> menunjukkan bahwa terdapat salah satu BoM yang tidak tersedia pada tabel.
+            sedangkan <span style="background-color: #b4a7d6">SKU dengan background ungu</span> menunjukkan bahwa terdapat salah satu BoM yang tidak tersedia pada tabel.
         </div>
     </div>
     <div id="app">
@@ -195,6 +195,16 @@
                 </select>
             </div>
         </div>
+
+        <div id="defaultOptionContainer" class="form-group" style="display:none;">
+    <label>
+        <input
+            type="checkbox"
+            id="isDefaultOption"
+        />
+        Insert Formula to other Campaigns
+    </label>
+</div>
 
         <button id="btnCreateLog">
             Start Promo Plan

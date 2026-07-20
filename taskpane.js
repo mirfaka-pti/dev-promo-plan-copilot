@@ -54,6 +54,15 @@ Office.onReady(async (info) => {
 
         await loadSheetNames();
 
+document
+    .getElementById("promoType")
+    .addEventListener(
+        "change",
+        handlePromoTypeChange
+    );
+
+handlePromoTypeChange();
+
         document
             .getElementById("btnCreateLog")
             .addEventListener(
@@ -76,7 +85,37 @@ Office.onReady(async (info) => {
     }
 
 });
+function handlePromoTypeChange() {
 
+    const promoType =
+        document.getElementById(
+            "promoType"
+        ).value;
+
+    const container =
+        document.getElementById(
+            "defaultOptionContainer"
+        );
+
+    const checkbox =
+        document.getElementById(
+            "isDefaultOption"
+        );
+
+    if (promoType === "default") {
+
+        container.style.display =
+            "block";
+
+    } else {
+
+        container.style.display =
+            "none";
+
+        checkbox.checked =
+            false;
+    }
+};
 /* ===========================
    LOAD SHEET NAME
 =========================== */
@@ -156,6 +195,11 @@ async function createLog() {
         const now =
             new Date();
 
+const isDefaultOption =
+    document.getElementById(
+        "isDefaultOption"
+    ).checked;
+
         const payload = {
             sheetId:
                 selectedOption.value,
@@ -172,7 +216,15 @@ async function createLog() {
                     now
                 )
         };
+if (
+    document.getElementById(
+        "promoType"
+    ).value === "default"
+) {
 
+    payload.isDefaultOption =
+        isDefaultOption;
+}
         const response =
             await fetch(
                 START_PROMO_URL,
