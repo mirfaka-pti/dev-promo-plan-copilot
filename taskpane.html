@@ -53,6 +53,10 @@
             border: 1px solid #d1d1d1;
         }
 
+        select:focus {
+            outline-color: #11783F;
+        }
+
         button {
             cursor: pointer;
             background: #11783F;
@@ -131,6 +135,21 @@
             font-weight: 600;
             color: #242424;
             line-height: 32px;
+        }
+
+        #defaultOptionContainer {
+            font-style: italic;
+            overflow: hidden;
+            align-items: flex-start;
+        }
+
+        #defaultOptionContainer input[type="checkbox"] {
+            margin: 0;
+            margin-right: 6px;
+            accent-color: #0a4c27;
+            width: 16px;
+            height: 16px;
+            vertical-align: top;
         }
     </style>
 </head>

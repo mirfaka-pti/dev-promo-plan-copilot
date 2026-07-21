@@ -105,7 +105,7 @@ function handlePromoTypeChange() {
     if (promoType === "default") {
 
         container.style.display =
-            "block";
+            "flex";
 
     } else {
 
