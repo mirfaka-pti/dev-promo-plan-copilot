@@ -8,7 +8,7 @@ const GET_NAME_URL =
     "https://n8n.parainfra.id/webhook/f3ed50fa-9fda-4370-bea5-3cfaa8254c3e";
 
 const START_PROMO_URL =
-    "https://n8n.parainfra.id/webhook/72de3eb8-1e4e-4c3a-b486-2a165daec3ae";
+    "https://n8n.parainfra.id/webhook/4ce2827a-b60f-49e0-abe6-e8cec2f2a6f9";
 
 const BASIC_AUTH =
     "ZGVtb0BkZW1vLmNvbTpEZW1vMTIzNCE=";
@@ -54,17 +54,8 @@ Office.onReady(async (info) => {
 
         await loadSheetNames();
 
-document
-    .getElementById("promoType")
-    .addEventListener(
-        "change",
-        handlePromoTypeChange
-    );
-
-handlePromoTypeChange();
-
         document
-            .getElementById("btnCreateLog")
+            .getElementById("btnReflectNewBundle")
             .addEventListener(
                 "click",
                 createLog
@@ -85,37 +76,6 @@ handlePromoTypeChange();
     }
 
 });
-function handlePromoTypeChange() {
-
-    const promoType =
-        document.getElementById(
-            "promoType"
-        ).value;
-
-    const container =
-        document.getElementById(
-            "defaultOptionContainer"
-        );
-
-    const checkbox =
-        document.getElementById(
-            "isDefaultOption"
-        );
-
-    if (promoType === "default") {
-
-        container.style.display =
-            "flex";
-
-    } else {
-
-        container.style.display =
-            "none";
-
-        checkbox.checked =
-            false;
-    }
-};
 /* ===========================
    LOAD SHEET NAME
 =========================== */
@@ -195,36 +155,21 @@ async function createLog() {
         const now =
             new Date();
 
-const isDefaultOption =
-    document.getElementById(
-        "isDefaultOption"
-    ).checked;
 
         const payload = {
             sheetId:
                 selectedOption.value,
+            program:
+                reflectNewBundle,
             brand:
                 document.getElementById(
                     "brand"
-                ).value,
-            promoType:
-                document.getElementById(
-                    "promoType"
                 ).value,
             execId:
                 formatExecutionId(
                     now
                 )
         };
-if (
-    document.getElementById(
-        "promoType"
-    ).value === "default"
-) {
-
-    payload.isDefaultOption =
-        isDefaultOption;
-}
         const response =
             await fetch(
                 START_PROMO_URL,
@@ -285,10 +230,6 @@ async function insertAutomationLog(now) {
     const selectedOption = sheetDropdown.options[sheetDropdown.selectedIndex];
     const sheetId = selectedOption.value;
     const sheetName = selectedOption.dataset.name;
-
-    const brand = document.getElementById("brand").value;
-    const promoType = document.getElementById("promoType").value;
-    const promoName = document.getElementById("promoType").name;
 
     // Siapkan data untuk baris baru
     const values = [[
