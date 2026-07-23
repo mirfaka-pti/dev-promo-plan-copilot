@@ -161,10 +161,6 @@ async function createLog() {
                 selectedOption.value,
             program:
                 "reflectNewBundle",
-            brand:
-                document.getElementById(
-                    "brand"
-                ).value,
             execId:
                 formatExecutionId(
                     now

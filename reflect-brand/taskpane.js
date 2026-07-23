@@ -224,7 +224,7 @@ if (
     ).value === "default"
 ) {
 
-    payload.isDefaultOption =
+    payload.isAllEvent =
         isDefaultOption;
 }
         const response =
@@ -290,7 +290,7 @@ async function insertAutomationLog(now) {
 
     const brand = document.getElementById("brand").value;
     const promoType = document.getElementById("promoType").value;
-    const promoName = document.getElementById("promoType").name;
+    const promoName = document.getElementById("promoType").dataset.name;
 
     // Siapkan data untuk baris baru
     const values = [[
