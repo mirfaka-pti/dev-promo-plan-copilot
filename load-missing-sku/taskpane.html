@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Promo Plan</title>
+
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script src="taskpane.js" defer></script>
+
+    <style>
+        body {
+            font-family: Segoe UI, Arial, sans-serif;
+            padding: 0 10px 10px;
+        }
+
+        .error {
+            color: #b00020;
+            border: 1px solid #b00020;
+            background: #fff5f5;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .form-group-duo {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 4px;
+            column-gap: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        select,
+        button {
+            width: 100%;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            line-height: 16px;
+            font-family: Segoe UI, sans-serif;
+            color: #424242;
+            border-radius: 4px;
+            border: 1px solid #d1d1d1;
+        }
+
+        select:focus {
+            outline-color: #11783F;
+        }
+
+        button {
+            cursor: pointer;
+            background: #11783F;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #146938;
+        }
+
+        #app {
+            display: none;
+            padding: 12px 16px;
+            background-color: #F8FDF8;
+            border: 1px solid #d1d1d1;
+            color: #424242;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        #info {
+            display: none;
+            padding: 12px 16px;
+            background-color: #fafafa;
+            border: 1px solid #d1d1d1;
+            color: #424242;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: "Segoe UI", sans-serif;
+            margin-bottom: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #107c10;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: all .3s ease;
+            transform: translateY(20px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #info .info-header { 
+            display: flex; 
+            margin-bottom: 10px; 
+        }
+
+        #info .info-badge { 
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-color: #F2FBF2;
+            text-align: center;
+            line-height: 36px;
+            border: 1px solid rgba(17,120,63,.3);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #info .info-title { 
+            padding-left: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #242424;
+            line-height: 32px;
+        }
+
+        #defaultOptionContainer {
+            font-style: italic;
+            overflow: hidden;
+            align-items: flex-start;
+        }
+
+        #defaultOptionContainer input[type="checkbox"] {
+            margin: 0;
+            margin-right: 6px;
+            accent-color: #0a4c27;
+            width: 16px;
+            height: 16px;
+            vertical-align: top;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="errorContainer"></div>
+
+    <div id="info">
+        <div class="info-header">
+            <div class="info-badge">
+                <img src="https://raw.githubusercontent.com/mirfaka-pti/icon-assets/main/promo-plan/icon-bundle-16.png">
+            </div>
+            <div class="info-title">
+                Reflect New Bundle
+            </div>
+        </div>
+        <div style="font-style: italic; line-height: 16px;">
+            Hanya memproses SKU yang tidak memiliki discount rate dan harga KAM di seluruh campaign.
+        </div>
+    </div>
+    <div id="app">
+        <div class="form-group">
+            <label>Sheet Name</label>
+            <select id="sheetName"></select>
+        </div>
+
+        <button id="btnReflectNewBundle" type="button">
+            Start Reflect New Bundle
+        </button>
+
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+</body>
+
+</html>
