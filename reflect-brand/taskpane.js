@@ -290,14 +290,14 @@ async function insertAutomationLog(now) {
 
     const brand = document.getElementById("brand").value;
     const promoType = document.getElementById("promoType").value;
-    const promoName = document.getElementById("promoType").dataset.name;
+    const promoName = document.getElementById("promoType").name;
 
     // Siapkan data untuk baris baru
     const values = [[
       formatExecutionId(now),
       formatDisplayDate(now),
       sheetName,
-      `Reflect per Brand (${brand}) [${promoName}]`,
+      `Reflect per Brand (${brand}) [${promoType}]`,
       "Dummy User",
       "On going",
       ""
