@@ -297,7 +297,7 @@ async function insertAutomationLog(now) {
       formatExecutionId(now),
       formatDisplayDate(now),
       sheetName,
-      `Reflect per Brand (${brand}) [${promoType}]`,
+      `Reflect per Brand (${brand}) [${promoName}]`,
       "Dummy User",
       "On going",
       ""
