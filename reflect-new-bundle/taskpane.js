@@ -160,7 +160,7 @@ async function createLog() {
             sheetId:
                 selectedOption.value,
             program:
-                reflectNewBundle,
+                "reflectNewBundle",
             brand:
                 document.getElementById(
                     "brand"

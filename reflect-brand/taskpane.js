@@ -204,7 +204,7 @@ const isDefaultOption =
             sheetId:
                 selectedOption.value,
             program:
-                reflectBrand,
+                "reflectBrand",
             brand:
                 document.getElementById(
                     "brand"
