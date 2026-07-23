@@ -55,7 +55,7 @@ Office.onReady(async (info) => {
         await loadSheetNames();
 
         document
-            .getElementById("btnReflectNewBundle")
+            .getElementById("btnCheckHetPrice")
             .addEventListener(
                 "click",
                 createLog
@@ -160,11 +160,7 @@ async function createLog() {
             sheetId:
                 selectedOption.value,
             program:
-                reflectNewBundle,
-            brand:
-                document.getElementById(
-                    "brand"
-                ).value,
+                "checkHetPrice",
             execId:
                 formatExecutionId(
                     now

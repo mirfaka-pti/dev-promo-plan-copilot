@@ -80,282 +80,180 @@ Office.onReady(async (info) => {
    LOAD SHEET NAME
 =========================== */
 
-async function loadSheetNames() {
 
-    const response = await fetch(
-        GET_NAME_URL,
-        {
-            method: "GET",
-            headers: {
-                Authorization:
-                    "Basic " + BASIC_AUTH
-            }
-        }
-    );
+  // ===== CONFIGURATION =====
+  var WEBHOOK_URL = 'https://n8n.parainfra.id/webhook/a6972c9b-c8bd-4f7a-a498-4926e7de3091';
+  var AUTH_TOKEN  = 'Basic cGFyYWdvbmR1bW15QGdtYWlsLmNvbTpQYXJhZ29uSmF5YTEyMyE='; 
 
-    if (!response.ok) {
+  // ===== STATE MANAGEMENT =====
+  var currentState = 'initial';
 
-        throw new Error(
-            "Gagal mengambil sheet name"
-        );
-    }
-
-    const data =
-        await response.json();
-
-    const dropdown =
-        document.getElementById(
-            "sheetName"
-        );
-
-    dropdown.innerHTML = "";
-
-    data.forEach(item => {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-        option.value =
-            item.id;
-
-        option.textContent =
-            item.name;
-
-        option.dataset.name =
-            item.name;
-
-        dropdown.appendChild(
-            option
-        );
-
+  function showState(name) {
+    var states = ['initial','loading','success','empty','error'];
+    states.forEach(function(s) {
+      var el = document.getElementById('state-' + s);
+      if (el) {
+        el.classList.remove('active');
+      }
     });
+    var target = document.getElementById('state-' + name);
+    if (target) target.classList.add('active');
+    currentState = name;
+  }
 
-}
+  // ===== SEARCH TRIGGER =====
+  var debounceTimer = null;
 
-/* ===========================
-   START PROMO
-=========================== */
-
-async function createLog() {
-
-    try {
-
-        const sheetDropdown =
-            document.getElementById(
-                "sheetName"
-            );
-
-        const selectedOption =
-            sheetDropdown.options[
-                sheetDropdown.selectedIndex
-            ];
-        
-        const now =
-            new Date();
-
-
-        const payload = {
-            sheetId:
-                selectedOption.value,
-            program:
-                reflectNewBundle,
-            brand:
-                document.getElementById(
-                    "brand"
-                ).value,
-            execId:
-                formatExecutionId(
-                    now
-                )
-        };
-        const response =
-            await fetch(
-                START_PROMO_URL,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-
-                        Authorization:
-                            "Basic " + BASIC_AUTH
-                    },
-                    body:
-                        JSON.stringify(
-                            payload
-                        )
-                }
-            );
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Gagal menjalankan promo plan"
-            );
-        }
-
-        await insertAutomationLog(now);
-
-        showToast(
-            "Berhasil ditambahkan"
-        );
-
+  document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      clearTimeout(debounceTimer);
+      triggerSearch();
     }
-    catch (error) {
-
-        console.error(error);
-
-        showToast(
-            error.message
-        );
-    }
-
-}
-
-/* ===========================
-   EXCEL LOG
-=========================== */
-
-async function insertAutomationLog(now) {
-  await Excel.run(async (context) => {
-    const worksheet = context.workbook.worksheets.getItem("Automation Log");
-
-    // Ambil tabel berdasarkan nama (pastikan nama tabel di Excel benar)
-    const table = worksheet.tables.getItem("AutomationLog");
-
-    // Ambil data dari elemen taskpane
-    const sheetDropdown = document.getElementById("sheetName");
-    const selectedOption = sheetDropdown.options[sheetDropdown.selectedIndex];
-    const sheetId = selectedOption.value;
-    const sheetName = selectedOption.dataset.name;
-
-    // Siapkan data untuk baris baru
-    const values = [[
-      formatExecutionId(now),
-      formatDisplayDate(now),
-      sheetName,
-      `Reflect per Brand (${brand}) [${promoName}]`,
-      "Dummy User",
-      "On going",
-      ""
-    ]];
-
-    // Tambahkan baris ke tabel
-    table.rows.add(null, values);
-
-    await context.sync();
   });
-}
+
+  function triggerSearch() {
+    var query = document.getElementById('searchInput').value.trim();
+    if (!query) {
+      showState('initial');
+      return;
+    }
+    performSearch(query);
+  }
 
 
-/* ===========================
-   TOAST
-=========================== */
+  // ===== PERFORM SEARCH (AJAX to Webhook) =====
+  function performSearch(sku) {
+    showState('loading');
 
-function showToast(message) {
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': AUTH_TOKEN
+      },
+      body: JSON.stringify({ sku: sku })
+    })
+    .then(function(res) {
+        if (res.status === 401) throw new Error('Unauthorized');
+        if (res.status === 403) throw new Error('Forbidden');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        handleResponse(data, sku);
+      })
+    .catch(function(err) {
+      showState('error');
+      var msg = 'Gagal terhubung ke server. Silakan coba lagi.';
+      if (err.message === 'Unauthorized') msg = 'Autentikasi gagal. Token tidak valid.';
+      if (err.message === 'Forbidden')    msg = 'Akses ditolak. Anda tidak memiliki izin.';
+      document.getElementById('errorDesc').textContent = msg;
+      console.error('Search error:', err);
+    });
+  }
 
-    const toast =
-        document.getElementById(
-            "toast"
-        );
+  // ===== RESPONSE HANDLER =====
+  function handleResponse(data, sku) {
+    if (typeof data === 'string') data = JSON.parse(data);
+    if (!data || data.status !== 'success') {
+      showState('error');
+      document.getElementById('errorDesc').textContent =
+        data && data.message ? data.message : 'Terjadi kesalahan. Coba lagi.';
+      return;
+    }
 
-    toast.textContent =
-        message;
+    var items = data.data;
 
-    toast.classList.add(
-        "show"
-    );
+    if (!items || items.length === 0) {
+      showState('empty');
+      document.getElementById('emptyDesc').textContent =
+        'SKU "' + sku + '" tidak ditemukan dalam sistem.';
+      return;
+    }
 
-    setTimeout(() => {
+    renderResults(items, sku);
+  }
 
-        toast.classList.remove(
-            "show"
-        );
+  // ===== RENDER RESULTS =====
+  function renderResults(items, sku) {
+    var label = document.getElementById('resultLabel');
+    var container = document.getElementById('resultContainer');
 
-    }, 3000);
+    label.textContent = "SEARCH RESULT FOR '" + sku.toUpperCase() + "'";
+    container.innerHTML = '';
 
-}
+    // Render main product (first item as header card)
+    var main = items[0];
+    var headerEl = document.createElement('div');
+    headerEl.className = 'product-header';
+    headerEl.innerHTML =
+      '<div class="product-thumb">' +
+        (main.image ? '<img src="https://d1wrygdlbvzcxl.cloudfront.net/' + escHtml(main.image) + '" alt=""/>' : '<span>' + (main.size || '64px') + '</span>') +
+      '</div>' +
+      '<div class="product-info">' +
+        '<div class="product-name">' + escHtml(main.name) + '</div>' +
+        (main.variant ? '<div class="product-sub">' + escHtml(main.variant || '') + '</div>' : '') +
+      '</div>';
+    container.appendChild(headerEl);
 
-/* ===========================
-   HELPER
-=========================== */
+    // Jika hanya 1 item, tampilkan bom-footer di luar product-header
+    if (items.length >= 1) {
+      var footerEl = document.createElement('div');
+      footerEl.className = 'bom-footer';
+      footerEl.style.cssText = 'margin-top: 4px;';
+      footerEl.innerHTML =
+        '<div class="bom-qty">Harga SAP: <br /><span>' + escHtml(String(main.sapPrice || 0)) + '</span></div>' +
+        '<div class="bom-stock">Harga Satuan: <br /><span>' + escHtml(String(main.price || 0)) + '</span></div>';
+      container.appendChild(footerEl);
+    }
 
-function formatExecutionId(date) {
+    // BOM section (remaining items)
+    if (items.length > 1) {
+      var sectionLabel = document.createElement('div');
+      sectionLabel.className = 'section-label';
+      sectionLabel.textContent = 'DETAIL BOM';
+      container.appendChild(sectionLabel);
 
-    const yy =
-        String(
-            date.getFullYear()
-        ).slice(-2);
+      items.slice(1).forEach(function(item, idx) {
+        var itemEl = document.createElement('div');
+        itemEl.className = 'bom-item';
+        itemEl.style.animationDelay = (idx * 0.04) + 's';
+        var qtyNum = (item.qty !== undefined && item.qty !== null) ? item.qty : 0;
+        var isCustomGwp  = item.isCustomGwp === true || item.isCustomGwp === 'true';
 
-    const mm =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
+        itemEl.innerHTML =
+          '<div class="bom-top">' +
+            '<div class="bom-thumb-wrap">' +
+              '<div class="bom-thumb">' +
+                (item.image ? '<img src="https://d1wrygdlbvzcxl.cloudfront.net/' + escHtml(item.image) + '" alt="" style="width:100%;height:100%;object-fit:cover;"/>' :
+                  '<span>' + (item.size || '48px') + '</span>') +
+              '</div>' +
+              '<span class="qty-badge">x' + escHtml(String(qtyNum)) + '</span>' +
+            '</div>' +
+            '<div class="bom-info">' +
+              '<div class="bom-info-header">' +
+                '<div class="bom-size">' + escHtml(item.sku || '') + '</div>' +
+                (isCustomGwp ? '<span class="new-badge">GWP</span>' : '') +
+              '</div>' +
+              '<div class="bom-desc">' + escHtml(item.name || '') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="bom-footer">' +
+            '<div class="bom-qty">Harga SAP: <br /><span>' + escHtml(String(item.sapPrice || 0)) + '</span></div>' +
+            '<div class="bom-stock">Harga Satuan: <br /><span>' + escHtml(String(item.price || 0)) + '</span></div>' +
+          '</div>';
+        container.appendChild(itemEl);
+      });
+    }
 
-    const dd =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
+    showState('success');
+  }
 
-    const hh =
-        String(
-            date.getHours()
-        ).padStart(2, "0");
-
-    const mi =
-        String(
-            date.getMinutes()
-        ).padStart(2, "0");
-
-    const ss =
-        String(
-            date.getSeconds()
-        ).padStart(2, "0");
-
-    return `${yy}${mm}${dd}-${hh}${mi}${ss}`;
-}
-
-function formatDisplayDate(date) {
-
-    const dd =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
-
-    const mm =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
-
-    const yyyy =
-        date.getFullYear();
-
-    const hh =
-        String(
-            date.getHours()
-        ).padStart(2, "0");
-
-    const mi =
-        String(
-            date.getMinutes()
-        ).padStart(2, "0");
-
-    const ss =
-        String(
-            date.getSeconds()
-        ).padStart(2, "0");
-
-    return `${dd}/${mm}/${yyyy} ${hh}:${mi}:${ss}`;
-}
-
-function escapeHtml(text = "") {
-
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+  // ===== UTILITY =====
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }

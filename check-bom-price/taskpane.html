@@ -1,190 +1,548 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Promo Plan</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKU Search Sidebar</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+<script src="taskpane.js" defer></script>
+<style>
+  /* === RESET & BASE === */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-    <script src="taskpane.js" defer></script>
+  :root {
+    --bg: #F0F4F9;
+    --surface: #FFFFFF;
+    --border: #E2E6EA;
+    --border-focus: #4A90D9;
+    --text-primary: #1A2332;
+    --text-secondary: #6B7A8D;
+    --text-muted: #9AA5B4;
+    --accent: #3D7FE8;
+    --accent-hover: #2D6FD8;
+    --accent-light: #EBF2FF;
+    --success: #27AE60;
+    --success-light: #E8F8EF;
+    --error: #E53935;
+    --error-light: #FDEAEA;
+    --warning-light: #FFF3E0;
+    --warning: #F57C00;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
 
-    <style>
-        body {
-            font-family: Segoe UI, Arial, sans-serif;
-            padding: 0 10px 10px;
-        }
+  body {
+    font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 2px;
+  }
 
-        .error {
-            color: #b00020;
-            border: 1px solid #b00020;
-            background: #fff5f5;
-            padding: 12px;
-            border-radius: 6px;
-        }
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; border-left: 6px solid var(--bg) }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        .form-group {
-            margin-bottom: 12px;
-            width: 100%;
-        }
+  /* === HEADER / SEARCH === */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    padding-bottom: 10px;
+    /* border-bottom: 1px solid var(--border);
+    padding: 10px 12px;
+    box-shadow: var(--shadow-sm); */
+  }
 
-        .form-group-duo {
-            display: flex;
-            justify-content: space-between;
-            padding-bottom: 4px;
-            column-gap: 15px;
-        }
+  .search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0 10px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
+  .search-wrapper:focus-within {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.12);
+    background: var(--surface);
+  }
 
-        select,
-        button {
-            width: 100%;
-            padding: 5px 10px;
-            box-sizing: border-box;
-            line-height: 16px;
-            font-family: Segoe UI, sans-serif;
-            color: #424242;
-            border-radius: 4px;
-            border: 1px solid #d1d1d1;
-        }
+  .search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 4px;
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+  }
 
-        select:focus {
-            outline-color: #11783F;
-        }
+  .search-input::placeholder { color: var(--text-muted); }
 
-        button {
-            cursor: pointer;
-            background: #11783F;
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
+  .search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition), background var(--transition);
+  }
 
-        button:hover {
-            background: #146938;
-        }
+  .search-btn:hover { color: var(--accent); background: var(--accent-light); }
 
-        #app {
-            display: none;
-            padding: 12px 16px;
-            background-color: #F8FDF8;
-            border: 1px solid #d1d1d1;
-            color: #424242;
-            border-radius: 8px;
-            font-size: 12px;
-            font-family: "Segoe UI", sans-serif;
-        }
+  .search-btn svg { width: 16px; height: 16px; }
 
-        #info {
-            display: none;
-            padding: 12px 16px;
-            background-color: #fafafa;
-            border: 1px solid #d1d1d1;
-            color: #424242;
-            border-radius: 8px;
-            font-size: 12px;
-            font-family: "Segoe UI", sans-serif;
-            margin-bottom: 10px;
-        }
+  /* === CONTENT AREA === */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
 
-        .toast {
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            background: #107c10;
-            color: white;
-            padding: 12px 18px;
-            border-radius: 6px;
-            opacity: 0;
-            transition: all .3s ease;
-            transform: translateY(20px);
-            pointer-events: none;
-            z-index: 9999;
-        }
+  /* === STATES === */
+  .state { display: none; flex-direction: column; }
+  .state.active { display: flex; }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+  /* Center states (initial, error, empty) */
+  .state-center {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 16px;
+    min-height: 320px;
+  }
 
-        #info .info-header { 
-            display: flex; 
-            margin-bottom: 10px; 
-        }
+  .state-illus {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 16px;
+    animation: fadeInUp var(--transition) ease;
+  }
 
-        #info .info-badge { 
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            background-color: #F2FBF2;
-            text-align: center;
-            line-height: 36px;
-            border: 1px solid rgba(17,120,63,.3);
-            box-sizing: border-box;
-            overflow: hidden;
-        }
+  .state-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
 
-        #info .info-title { 
-            padding-left: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #242424;
-            line-height: 32px;
-        }
+  .state-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    max-width: 200px;
+    line-height: 1.6;
+  }
 
-        #defaultOptionContainer {
-            font-style: italic;
-            overflow: hidden;
-            align-items: flex-start;
-        }
+  /* === LOADING STATE === */
+  #state-loading {
+    gap: 10px;
+    padding: 12px 0;
+  }
 
-        #defaultOptionContainer input[type="checkbox"] {
-            margin: 0;
-            margin-right: 6px;
-            accent-color: #0a4c27;
-            width: 16px;
-            height: 16px;
-            vertical-align: top;
-        }
-    </style>
+  .skeleton-header {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+  }
+
+  .skeleton-box {
+    background: linear-gradient(90deg, var(--border) 25%, #E8ECF0 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    border-radius: 4px;
+    animation: shimmer 1.4s infinite;
+  }
+
+  .skeleton-thumb { width: 48px; height: 48px; border-radius: var(--radius-sm); flex-shrink: 0; }
+  .skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .skeleton-line-lg { height: 11px; width: 80%; }
+  .skeleton-line-md { height: 9px; width: 55%; }
+  .skeleton-line-sm { height: 9px; width: 40%; }
+
+  .skeleton-item {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* === RESULT LABEL === */
+  .result-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 2px;
+  }
+
+  /* === PRODUCT CARD (main/header) === */
+  .product-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
+    animation: slideIn 0.25s ease;
+  }
+
+  .product-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    overflow: hidden;
+  }
+
+  .product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .product-info { flex: 1; min-width: 0; }
+
+  .product-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 3px;
+  }
+
+  .product-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  /* === SECTION LABEL === */
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-bottom: 4px;
+    margin-top: 18px;
+  }
+
+  /* === BOM ITEM === */
+  .bom-item {
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+    margin-bottom: 6px;
+    animation: slideIn 0.2s ease both;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  .bom-item:hover {
+    border-bottom-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .bom-top {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+
+  .bom-thumb {
+    width: 48px;
+    height: 48px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .bom-info { flex: 1; min-width: 0; }
+
+  .bom-size {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+  }
+
+  .bom-desc {
+    font-size: 12px;
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .bom-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 6px;
+    border-top: 1px dashed var(--border);
+    font-size: 12px;
+  }
+
+  .bom-qty { color: var(--text-secondary); }
+  .bom-qty span { color: var(--text-primary); font-weight: 600; }
+
+  .bom-stock { color: var(--text-secondary); text-align: right; }
+  .bom-stock span { color: var(--text-primary); font-weight: 600; }
+
+  .divider { border: none; border-top: 1px dashed var(--border); margin: 4px 0; }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* === QTY BADGE & NEW BADGE === */
+  .bom-thumb-wrap {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .bom-thumb-wrap .bom-thumb {
+    width: 100%;
+    height: 100%;
+  }
+
+  .qty-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #1A2332;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 20px;
+    border: 1.5px solid #fff;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .new-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #E8F5E9;
+    color: #2E7D32;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+    border: 1px solid #A5D6A7;
+    white-space: nowrap;
+  }
+
+  .new-badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #43A047;
+    display: inline-block;
+  }
+
+  .bom-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+</style>
 </head>
-
 <body>
 
-    <div id="errorContainer"></div>
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <div class="search-wrapper">
+    <input
+      class="search-input"
+      id="searchInput"
+      type="text"
+      placeholder="Find by SKU..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button class="search-btn" id="searchBtn" title="Search" onclick="triggerSearch()">
+      <svg viewBox="0 0 20 20" fill="none">
+        <circle cx="8.5" cy="8.5" r="5" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M13 13L17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+</div>
 
-    <div id="info">
-        <div class="info-header">
-            <div class="info-badge">
-                <img src="https://raw.githubusercontent.com/mirfaka-pti/icon-assets/main/promo-plan/icon-bundle-16.png">
-            </div>
-            <div class="info-title">
-                Reflect New Bundle
-            </div>
-        </div>
-        <div style="font-style: italic; line-height: 16px;">
-            Hanya memproses SKU yang tidak memiliki discount rate dan harga KAM di seluruh campaign.
-        </div>
+<!-- ==================== CONTENT ==================== -->
+<div class="content">
+
+  <!-- 1. INITIAL STATE -->
+  <div class="state state-center active" id="state-initial">
+    <svg class="state-illus" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background circle -->
+      <circle cx="60" cy="60" r="52" fill="#F0F2F5"/>
+      <!-- Accent blobs -->
+      <circle cx="34" cy="44" r="9" fill="#4CAF50" opacity="0.85"/>
+      <rect x="74" y="68" width="22" height="18" rx="5" fill="#FFCDD2" opacity="0.7"/>
+      <!-- Document -->
+      <rect x="58" y="22" width="36" height="44" rx="4" fill="#BBDEFB" stroke="#90CAF9" stroke-width="1.2"/>
+      <path d="M82 22v10h12" fill="none" stroke="#90CAF9" stroke-width="1.2"/>
+      <rect x="82" y="22" width="12" height="10" rx="0" fill="#90CAF9" opacity="0.4"/>
+      <line x1="64" y1="38" x2="82" y2="38" stroke="#64B5F6" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="64" y1="44" x2="88" y2="44" stroke="#64B5F6" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="64" y1="50" x2="80" y2="50" stroke="#90CAF9" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- Magnifier -->
+      <circle cx="50" cy="68" r="18" fill="#FFD54F" stroke="#F9A825" stroke-width="2"/>
+      <circle cx="50" cy="68" r="11" fill="white" stroke="#F9A825" stroke-width="1.5"/>
+      <line x1="57" y1="80" x2="66" y2="92" stroke="#F9A825" stroke-width="4" stroke-linecap="round"/>
+      <!-- Scan lines inside lens -->
+      <line x1="44" y1="65" x2="56" y2="65" stroke="#E0E0E0" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="44" y1="69" x2="56" y2="69" stroke="#E0E0E0" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="44" y1="73" x2="52" y2="73" stroke="#E0E0E0" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <div class="state-title">Cari produk berdasarkan SKU</div>
+    <div class="state-desc">Ketik SKU pada kolom pencarian di atas lalu tekan Enter</div>
+  </div>
+
+  <!-- 2. LOADING STATE -->
+  <div class="state" id="state-loading">
+    <div class="skeleton-header">
+      <div class="skeleton-box skeleton-thumb"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton-box skeleton-line-lg"></div>
+        <div class="skeleton-box skeleton-line-md"></div>
+      </div>
     </div>
-    <div id="app">
-        <div class="form-group">
-            <label>Sheet Name</label>
-            <select id="sheetName"></select>
-        </div>
-
-        <button id="btnReflectNewBundle" type="button">
-            Start Reflect New Bundle
-        </button>
-
+    <div style="height:6px"></div>
+    <div class="skeleton-item">
+      <div class="skeleton-box skeleton-thumb" style="width:48px;height:48px"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton-box skeleton-line-sm"></div>
+        <div class="skeleton-box skeleton-line-lg"></div>
+        <div class="skeleton-box skeleton-line-md"></div>
+      </div>
     </div>
+    <div class="skeleton-item" style="animation-delay:.05s">
+      <div class="skeleton-box skeleton-thumb" style="width:48px;height:48px"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton-box skeleton-line-sm"></div>
+        <div class="skeleton-box skeleton-line-lg"></div>
+        <div class="skeleton-box skeleton-line-md"></div>
+      </div>
+    </div>
+    <div class="skeleton-item" style="animation-delay:.1s">
+      <div class="skeleton-box skeleton-thumb" style="width:48px;height:48px"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton-box skeleton-line-sm"></div>
+        <div class="skeleton-box skeleton-line-lg"></div>
+        <div class="skeleton-box skeleton-line-md"></div>
+      </div>
+    </div>
+  </div>
 
-    <div id="toast" class="toast"></div>
+  <!-- 3. SUCCESS STATE -->
+  <div class="state" id="state-success">
+    <div class="result-label" id="resultLabel"></div>
+    <div id="resultContainer"></div>
+  </div>
 
+  <!-- 4. EMPTY / NOT FOUND STATE -->
+  <div class="state state-center" id="state-empty">
+    <svg class="state-illus" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="52" fill="#FDEAEA"/>
+      <!-- X mark -->
+      <circle cx="60" cy="60" r="30" fill="#FFCDD2"/>
+      <line x1="46" y1="46" x2="74" y2="74" stroke="#E53935" stroke-width="6" stroke-linecap="round"/>
+      <line x1="74" y1="46" x2="46" y2="74" stroke="#E53935" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+    <div class="state-title">SKU tidak ditemukan</div>
+    <div class="state-desc" id="emptyDesc">Data tidak tersedia. Coba SKU yang lain.</div>
+  </div>
+
+  <!-- 5. ERROR STATE -->
+  <div class="state state-center" id="state-error">
+    <svg class="state-illus" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="52" fill="#FFF3E0"/>
+      <!-- Double exclamation -->
+      <rect x="36" y="34" width="14" height="36" rx="7" fill="#E53935"/>
+      <circle cx="43" cy="80" r="7" fill="#E53935"/>
+      <rect x="70" y="34" width="14" height="36" rx="7" fill="#E53935"/>
+      <circle cx="77" cy="80" r="7" fill="#E53935"/>
+    </svg>
+    <div class="state-title">Terjadi kesalahan sistem</div>
+    <div class="state-desc" id="errorDesc">Gagal terhubung ke server. Silakan coba lagi.</div>
+  </div>
+
+</div><!-- end .content -->
+
+<script>
+</script>
 </body>
-
 </html>
