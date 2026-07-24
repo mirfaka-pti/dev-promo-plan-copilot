@@ -7,25 +7,74 @@
   var PROMO_PLAN_KEYWORD = "promo"; // Only allow this add-in on workbooks whose URL contains this keyword
 
   // ===== OFFICE INITIALIZATION =====
-  Office.onReady(function (info) {
-    try {
-      var isExcel = info.host === Office.HostType.Excel;
-      var workbookUrl =
-        (Office && Office.context && Office.context.document && Office.context.document.url) || "";
-      var isPromoPlan = workbookUrl.toLowerCase().indexOf(PROMO_PLAN_KEYWORD) !== -1;
+  // Office.onReady(function (info) {
+  //   try {
+  //     var isExcel = info.host === Office.HostType.Excel;
+  //     var workbookUrl =
+  //       (Office && Office.context && Office.context.document && Office.context.document.url) || "";
+  //     var isPromoPlan = workbookUrl.toLowerCase().indexOf(PROMO_PLAN_KEYWORD) !== -1;
 
-      if (!isExcel || !isPromoPlan) {
-        showUnavailable(workbookUrl);
-        return;
-      }
+  //     if (!isExcel || !isPromoPlan) {
+  //       showUnavailable(workbookUrl);
+  //       return;
+  //     }
+
+  //     initTaskpane();
+  //   } catch (error) {
+  //     console.error(error);
+  //     showUnavailable("", error.message);
+  //   }
+  // });
+Office.onReady(async (info) => {
+
+    try {
+
+        const isExcel =
+            info.host === Office.HostType.Excel;
+
+        const workbookUrl =
+            Office?.context?.document?.url || "";
+
+        const isPromoPlan =
+            workbookUrl
+                .toLowerCase()
+                .includes(PROMO_PLAN_KEYWORD);
+
+        if (!isExcel || !isPromoPlan) {
+
+            document.getElementById(
+                "errorContainer"
+            ).innerHTML = `
+                <div class="error">
+                    <h3>Add-in tidak dapat digunakan</h3>
+                    <div><b>Workbook URL:</b></div>
+                    <div>${escapeHtml(workbookUrl)}</div>
+                </div>
+            `;
+
+            return;
+        }
+
+        document.getElementById("app")
+            .style.display = "block";
 
       initTaskpane();
-    } catch (error) {
-      console.error(error);
-      showUnavailable("", error.message);
-    }
-  });
 
+    }
+    catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "errorContainer"
+        ).innerHTML = `
+            <div class="error">
+                ${error.message}
+            </div>
+        `;
+    }
+
+});
   // ===== URL / HOST GATE =====
   // Shows the existing "error" state repurposed as a blocking message when
   // the add-in is opened outside Excel, or in an Excel workbook whose URL
