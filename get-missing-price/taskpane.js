@@ -8,7 +8,7 @@ const GET_NAME_URL =
     "https://n8n.parainfra.id/webhook/f3ed50fa-9fda-4370-bea5-3cfaa8254c3e";
 
 const START_PROMO_URL =
-    "https://n8n.parainfra.id/webhook/4ce2827a-b60f-49e0-abe6-e8cec2f2a6f9";
+    "https://n8n.parainfra.id/webhook/425ac212-2a82-482e-ad0b-17357ca92b6b";
 
 const BASIC_AUTH =
     "ZGVtb0BkZW1vLmNvbTpEZW1vMTIzNCE=";
