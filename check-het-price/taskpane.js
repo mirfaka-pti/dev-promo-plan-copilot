@@ -8,7 +8,7 @@ const GET_NAME_URL =
     "https://n8n.parainfra.id/webhook/f3ed50fa-9fda-4370-bea5-3cfaa8254c3e";
 
 const START_PROMO_URL =
-    "https://n8n.parainfra.id/webhook/4ce2827a-b60f-49e0-abe6-e8cec2f2a6f9";
+    "https://n8n.parainfra.id/webhook/8a2e1566-49dc-4568-ac32-5557dabf2f40";
 
 const BASIC_AUTH =
     "ZGVtb0BkZW1vLmNvbTpEZW1vMTIzNCE=";
@@ -232,7 +232,7 @@ async function insertAutomationLog(now) {
       formatExecutionId(now),
       formatDisplayDate(now),
       sheetName,
-      `Reflect per Brand (${brand}) [${promoName}]`,
+      `Check HET Price`,
       "Dummy User",
       "On going",
       ""
