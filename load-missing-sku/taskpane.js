@@ -8,7 +8,7 @@ const GET_NAME_URL =
     "https://n8n.parainfra.id/webhook/f3ed50fa-9fda-4370-bea5-3cfaa8254c3e";
 
 const START_PROMO_URL =
-    "https://n8n.parainfra.id/webhook/4ce2827a-b60f-49e0-abe6-e8cec2f2a6f9";
+    "https://n8n.parainfra.id/webhook/1ddb20c4-852a-4060-8aa7-62db6a52da4f";
 
 const BASIC_AUTH =
     "ZGVtb0BkZW1vLmNvbTpEZW1vMTIzNCE=";
@@ -137,6 +137,69 @@ async function loadSheetNames() {
 /* ===========================
    START PROMO
 =========================== */
+/* ===========================
+   GET ANOMALY SKU CODES
+=========================== */
+
+async function getAnomalySkuCodes(tableId) {
+
+    return await Excel.run(async (context) => {
+        const tableName = tableId === "{00000000-0001-0000-0000-000000000000}" ? "PromoPlan1" : "PromoPlan2";
+        const table =
+            context.workbook.tables.getItem(tableName);
+
+        // Range body tabel (tanpa header & total row)
+        const bodyRange =
+            table.getDataBodyRange();
+
+        const colB =
+            bodyRange.getColumn(1); // kolom B (0-based index 1)
+
+        const colC =
+            bodyRange.getColumn(2); // kolom C (0-based index 2)
+
+        // Ambil value kolom C dalam 1 batch (murah)
+        colC.load("values");
+
+        // Ambil HANYA fill color kolom B dalam 1 batch,
+        // bukan getCell() per baris (menghindari 20rb proxy object)
+        const cellProps =
+            colB.getCellProperties({
+                format: {
+                    fill: {
+                        color: true
+                    }
+                }
+            });
+
+        await context.sync();
+
+        const values = colC.values;         // [[v],[v],...]
+        const props = cellProps.value;      // [[{format:{fill:{color}}}],...]
+
+        const TARGET_COLOR = "#B4A7D6";
+        const result = [];
+
+        for (let i = 0; i < props.length; i++) {
+
+            const color =
+                props[i][0]?.format?.fill?.color;
+
+            if (
+                color &&
+                color.toUpperCase() === TARGET_COLOR
+            ) {
+                const code = values[i][0];
+
+                if (code !== "" && code !== null) {
+                    result.push(code);
+                }
+            }
+        }
+
+        return result;
+    });
+}
 
 async function createLog() {
 
@@ -155,6 +218,9 @@ async function createLog() {
         const now =
             new Date();
 
+        // Ambil kode SKU yang kolom B-nya berwarna #b4a7d6
+        const anomalySkuCodes =
+            await getAnomalySkuCodes(selectedOption.value);
 
         const payload = {
             sheetId:
@@ -164,7 +230,8 @@ async function createLog() {
             execId:
                 formatExecutionId(
                     now
-                )
+                ),
+            checkItems: anomalySkuCodes 
         };
         const response =
             await fetch(
@@ -232,7 +299,7 @@ async function insertAutomationLog(now) {
       formatExecutionId(now),
       formatDisplayDate(now),
       sheetName,
-      `Reflect per Brand (${brand}) [${promoName}]`,
+      `Load Missing SKU`,
       "Dummy User",
       "On going",
       ""
